@@ -1,5 +1,6 @@
 require 'memfs/version'
 require 'fileutils'
+require 'pathname'
 
 # Provides a clean way to interact with a fake file system.
 #
@@ -25,10 +26,14 @@ module MemFs
   # Keeps track of the original Ruby IO class.
   OriginalIO = ::IO
 
+  # Keeps track of the original Ruby Pathname class.
+  OriginalPathname = ::Pathname
+
   require 'memfs/file_system'
   require 'memfs/dir'
   require 'memfs/file'
   require 'memfs/file/stat'
+  require 'memfs/pathname'
 
   # Calls the given block with MemFs activated.
   #
@@ -78,10 +83,12 @@ module MemFs
       remove_const :Dir
       remove_const :File
       remove_const :IO
+      remove_const :Pathname
 
       const_set :Dir, MemFs::Dir
       const_set :IO, MemFs::IO
       const_set :File, MemFs::File
+      const_set :Pathname, MemFs::Pathname
     end
 
     MemFs::FileSystem.instance.clear! if clear
@@ -99,10 +106,12 @@ module MemFs
       remove_const :Dir
       remove_const :File
       remove_const :IO
+      remove_const :Pathname
 
       const_set :Dir, MemFs::OriginalDir
       const_set :IO, MemFs::OriginalIO
       const_set :File, MemFs::OriginalFile
+      const_set :Pathname, MemFs::OriginalPathname
     end
   end
   module_function :deactivate!

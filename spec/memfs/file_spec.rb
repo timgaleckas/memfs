@@ -994,7 +994,7 @@ module MemFs
 
       context 'when the path is a Pathname' do
         it 'returns the string representation of the path' do
-          path = described_class.path(Pathname.new('/some/path'))
+          path = described_class.path(::Pathname.new('/some/path'))
           expect(path).to eq '/some/path'
         end
       end

@@ -248,8 +248,8 @@ module MemFs
       it_behaves_like 'returning matching filenames', '/test?', %w[/test0 /test1 /test2]
       it_behaves_like 'returning matching filenames', '/test[01]', %w[/test0 /test1]
       it_behaves_like 'returning matching filenames', '/test[^2]', %w[/test0 /test1]
-      it_behaves_like 'returning matching filenames', Pathname.new('/'), %w[/]
-      it_behaves_like 'returning matching filenames', Pathname.new('/*'), %w[/tmp /test0 /test1 /test2]
+      it_behaves_like 'returning matching filenames', ::Pathname.new('/'), %w[/]
+      it_behaves_like 'returning matching filenames', ::Pathname.new('/*'), %w[/tmp /test0 /test1 /test2]
 
       if defined?(File::FNM_EXTGLOB)
         it_behaves_like 'returning matching filenames', '/test{1,2}', %w[/test1 /test2]
