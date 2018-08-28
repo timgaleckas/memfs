@@ -91,6 +91,15 @@ module MemFs
       const_set :Pathname, MemFs::Pathname
     end
 
+    begin
+      Rack::File.class_eval do
+        remove_const :F
+        const_set :F, MemFs::File
+      end
+    rescue NameError
+      #rack isn't required, we don't need to patch it
+    end
+
     MemFs::FileSystem.instance.clear! if clear
   end
   module_function :activate!
@@ -112,6 +121,16 @@ module MemFs
       const_set :IO, MemFs::OriginalIO
       const_set :File, MemFs::OriginalFile
       const_set :Pathname, MemFs::OriginalPathname
+
+      begin
+        Rack::File.class_eval do
+          remove_const :F
+          const_set :F, MemFs::OriginalFile
+        end
+      rescue NameError
+        #rack isn't required, we don't need to patch it
+      end
+
     end
   end
   module_function :deactivate!
