@@ -51,18 +51,36 @@ module MemFs
     end
     class << self; alias_method :pwd, :getwd; end
 
-    def self.glob(patterns, flags = 0)
-      patterns = [*patterns].map(&:to_s)
+    def self.glob_items(glob_segment)
+      glob_segment.split(',', -1)
+    end
+
+    def self.expand_glob(s)
+      strings = []
+      s.match(/^(.*){([^{}]+)}(.*)$/) do |match|
+        strings += glob_items(match[2]).map{|glob_item| expand_glob(match[1] + glob_item + match[3]) }.flatten
+      end
+      strings.empty? ? [s] : strings
+    end
+
+    def self.glob(p, flags = 0)
+      patterns = Array(p).map{|_p|expand_glob(_p.to_s)}.flatten
+
       list = fs.paths.select do |path|
         patterns.any? do |pattern|
           File.fnmatch?(pattern, path, flags | GLOB_FLAGS)
         end
+      end.reject do |path|
+        # FIXME: ugly special case for /* and /
+        path == '/' && patterns.first == '/*'
       end
-      # FIXME: ugly special case for /* and /
-      list.delete('/') if patterns.first == '/*'
-      return list unless block_given?
-      list.each { |path| yield path }
-      nil
+
+      if block_given?
+        list.each { |path| yield path }
+        nil
+      else
+        list
+      end
     end
 
     def self.home(*args)
